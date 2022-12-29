@@ -151,4 +151,7 @@ media/
 # мои папки
 api/
 users/
-
+api_yamdb/
+static/
+template/
+manage.py
