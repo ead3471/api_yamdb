@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, filters, mixins
+from rest_framework import viewsets
 
 from artworks.models import Title, Review, Comment
 from .serializers import TitleSerializer, ReviewSerializer, CommentSerializer
@@ -23,11 +23,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title_id = self.kwargs.get('title_id')
         serializer.save(author=self.request.user, title_id=title_id)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['title'] = self.kwargs.get('title_id')
-        # return {'title': self.kwargs.get('title_id')}
-        return context
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     context['title'] = self.kwargs.get('title_id')
+    #     # return {'title': self.kwargs.get('title_id')}
+    #     return context
 
 
 class CommentViewSet(viewsets.ModelViewSet):
