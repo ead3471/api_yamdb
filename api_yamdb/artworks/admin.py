@@ -3,7 +3,7 @@ from .models import Title, Review, Comment
 
 
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'description')
+    list_display = ('pk', 'name', 'description')
     empty_value_display = '-пусто-'
 
 

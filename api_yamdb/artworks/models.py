@@ -1,12 +1,12 @@
 from django.db import models
 from django.db.models import Avg
-
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from users.models import User
 
 
 class Title(models.Model):
+    name = models.TextField(verbose_name="Название")
     description = models.TextField(verbose_name="Краткое описание",
                                    null=True,
                                    blank=True)
