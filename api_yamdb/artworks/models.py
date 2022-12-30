@@ -10,9 +10,10 @@ User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(verbose_name="Category name",
-                            max_length=20)
+                            max_length=256)
     slug = models.SlugField(verbose_name="Category slug",
                             max_length=50,
+                            unique=True,
                             validators=[
                                 RegexValidator(regex="^[-a-zA-Z0-9_]+$")
                             ])
@@ -26,6 +27,7 @@ class Genre(models.Model):
                             max_length=256)
     slug = models.SlugField(verbose_name="Genre slug",
                             max_length=50,
+                            unique=True,
                             validators=[
                                 RegexValidator(regex="^[-a-zA-Z0-9_]+$")
                             ])
@@ -45,16 +47,16 @@ class Title(models.Model):
                                    null=True,
                                    blank=True)
 
-    rate = models.DecimalField(verbose_name="Raiting",
-                               max_digits=2,
-                               decimal_places=1,
-                               default=0)
+    rating = models.DecimalField(verbose_name="Raiting",
+                                 max_digits=2,
+                                 decimal_places=1,
+                                 default=0)
 
     year = models.IntegerField(verbose_name="Creation year",
                                validators=[
                                    MinValueValidator(MINIMUM_TITLE_YEAR),
                                    MaxValueValidator(
-                                       lambda: datetime.now().minute)],
+                                       lambda: datetime.now().year)],
                                )
 
     category = models.ForeignKey(Category,
@@ -65,7 +67,9 @@ class Title(models.Model):
 
     genre = models.ManyToManyField(Genre,
                                    verbose_name='Genre',
-                                   related_name="titles")
+                                   related_name="titles",
+                                   blank=True,
+                                   )
 
     def __str__(self) -> str:
         return self.name
