@@ -1,12 +1,11 @@
 from rest_framework import serializers
-# from rest_framework.relations import SlugRelatedField
-# from rest_framework.validators import UniqueTogetherValidator
 
 from artworks.models import Title, Review, Comment
 from django.shortcuts import get_object_or_404
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField()
 
     class Meta:
         model = Title
@@ -20,14 +19,26 @@ class ReviewSerializer(serializers.ModelSerializer):
     title = serializers.PrimaryKeyRelatedField(read_only=True)
 
     def validate(self, attrs):
-        title = get_object_or_404(Title, id=self.context.get('title_id'))
+        title = get_object_or_404(
+            Title,
+            id=self.context['view'].kwargs.get('title_id'))
         author = self.context['request'].user
-        if Review.objects.filter(
-                title_id=title,
-                author_id=author).exists():
+        if self.context['request'].method == 'POST':
+            Review.objects.filter(title_id=title, author_id=author).exists()
             raise serializers.ValidationError(
-                'Вы уже оставили отзыв на данное произведение!')
+                'You have already left a review for this title!')  # ?
         return attrs
+
+    # def validate(self, attrs):
+    #     if self.context['request'].method == 'POST':
+    #         title = get_object_or_404(Title, id=self.context.get('title_id'))
+    #         author = self.context['request'].user
+    #         if Review.objects.filter(
+    #                 title_id=title,
+    #                 author_id=author).exists():
+    #             raise serializers.ValidationError(
+    #                 'You have already left a review for this title!')  # ?
+    #     return attrs
 
     class Meta:
         model = Review

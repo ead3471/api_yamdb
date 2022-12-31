@@ -4,9 +4,11 @@ from artworks.models import Title, Review, Comment
 from .serializers import TitleSerializer, ReviewSerializer, CommentSerializer
 from .permissions import AreAuthorModerAdminOrReadOnly
 
+from django.db.models import Avg
+
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
 
     def perform_create(self, serializer):
@@ -19,16 +21,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        return Review.objects.filter(title_id=title_id)
+        return Review.objects.filter(title_id=title_id)  # related_name
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
         serializer.save(author=self.request.user, title_id=title_id)
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({'title_id': self.kwargs.get('title_id')})
-        return context
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     context.update({'title_id': self.kwargs.get('title_id')})
+    #     return context
 
 
 class CommentViewSet(viewsets.ModelViewSet):
