@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         if value.lower() == 'me':
             raise ValidationError(
-                f'Username \'me\' is reserved, please chose another one'
+                f'Username \'me\' is reserved, please choose another one'
             )
         return value
 
