@@ -13,10 +13,13 @@ from rest_framework.viewsets import (
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.permissions import IsAdmin
+from api.permissions import IsAdmin, IsAuthorModerAdmin
 from api.serializers import (
     AuthSignupSerializer, AuthTokenSerializer,
-    UserSerializer, UserRoleReadOnlySerializer
+    UserSerializer, UserRoleReadOnlySerializer,
+    TitleSerializer,
+    ReviewSerializer,
+    CommentSerializer
 )
 
 REGISTRATION_EMAIL_SUBJECT = 'YAMDB registration.'
@@ -24,6 +27,7 @@ REGISTRATION_EMAIL_FROM = 'team15@yamdb.fake'
 
 
 User = get_user_model()
+
 
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
@@ -81,10 +85,45 @@ class AuthViewSet(GenericViewSet):
     def token(self, request):
         serializer = AuthTokenSerializer(data=request.data)
         if serializer.is_valid():
-            user = get_object_or_404(User, username=serializer.validated_data.get('username'))
+            user = get_object_or_404(
+                User, username=serializer.validated_data.get('username'))
             tokens = RefreshToken.for_user(user)
             return Response(
                 data={'token': str(tokens.access_token)},
                 status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TitleViewSet(ModelViewSet):
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    serializer_class = TitleSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class ReviewViewSet(ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = (IsAuthorModerAdmin,)
+
+    def get_queryset(self):
+        title_id = self.kwargs.get('title_id')
+        return Review.objects.filter(title_id=title_id)
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        serializer.save(author=self.request.user, title_id=title_id)
+
+
+class CommentViewSet(ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthorModerAdmin,)
+
+    def get_queryset(self):
+        review_id = self.kwargs.get('review_id')
+        return Comment.objects.filter(review_id=review_id)
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs.get('review_id')
+        serializer.save(author=self.request.user, review_id=review_id)
