@@ -1,10 +1,14 @@
-from django.urls import include, path
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .views import TitleViewSet, ReviewViewSet, CommentViewSet
+
+from api.views import (UserViewSet, AuthViewSet,
+                        TitleViewSet, ReviewViewSet, CommentViewSet)
 
 router_api_v1 = DefaultRouter()
-
+router_api_v1.register(r'^users', UserViewSet)
+router_api_v1.register(r'^auth', AuthViewSet)
 router_api_v1.register('titles', TitleViewSet, basename='titles')
 router_api_v1.register(
     r'^titles/(?P<title_id>\d+)/reviews',

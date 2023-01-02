@@ -16,3 +16,9 @@ class IsAuthorModerAdmin(permissions.BasePermission):
             return True
         if request.user.role == 'user':
             return obj.author_id == request.user.id
+from rest_framework.permissions import BasePermission
+
+
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'admin'

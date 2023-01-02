@@ -9,7 +9,6 @@ USER_ROLES = (
 )
 DEFAULT_USER_ROLE = 'user'
 
-
 class User(AbstractUser):
     email = models.EmailField(
         'Email address',
