@@ -1,9 +1,8 @@
 from django.db import models
-# from django.db.models import Avg
-
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from users.models import User
+User = get_user_model()
 
 
 class Title(models.Model):
@@ -15,15 +14,7 @@ class Title(models.Model):
     created_at = models.DateTimeField(verbose_name="Creation year",
                                       auto_now_add=True)
 
-    # @property
-    # def rating(self):
-    #     rating = (self.reviews.aggregate(Avg('score')).get('score__avg'))
-    #     if rating is None:
-    #         return None
-    #     else:
-    #         return round(rating)
-
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
 
@@ -34,7 +25,8 @@ class Review(models.Model):
         related_name='reviews'
     )
     text = models.TextField(
-        verbose_name="Review text"
+        verbose_name="Review text",
+        blank=False
     )
     author = models.ForeignKey(
         User,
@@ -44,6 +36,7 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         verbose_name="Score of the title",
+        blank=False,
         default=0,
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
@@ -66,7 +59,8 @@ class Comment(models.Model):
         related_name='сomments',
     )
     text = models.TextField(
-        verbose_name="Сomment text"
+        verbose_name="Сomment text",
+        blank=False
     )
     author = models.ForeignKey(
         User,

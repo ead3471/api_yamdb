@@ -9,11 +9,13 @@ USER_ROLES = (
 )
 DEFAULT_USER_ROLE = 'user'
 
+
 class User(AbstractUser):
     email = models.EmailField(
-        'email address',
+        'Email address',
         unique=True,
-        blank=False
+        blank=False,
+        null=False
     )
     bio = models.TextField(
         'Biography',

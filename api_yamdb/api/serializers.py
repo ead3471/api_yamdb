@@ -1,7 +1,7 @@
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
 
 from artworks.models import Title, Review, Comment
-from django.shortcuts import get_object_or_404
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -24,21 +24,11 @@ class ReviewSerializer(serializers.ModelSerializer):
             id=self.context['view'].kwargs.get('title_id'))
         author = self.context['request'].user
         if self.context['request'].method == 'POST':
-            Review.objects.filter(title_id=title, author_id=author).exists()
-            raise serializers.ValidationError(
-                'You have already left a review for this title!')  # ?
+            if Review.objects.filter(
+                    title_id=title, author_id=author).exists():
+                raise serializers.ValidationError(
+                    'You have already left a review for this title!')
         return attrs
-
-    # def validate(self, attrs):
-    #     if self.context['request'].method == 'POST':
-    #         title = get_object_or_404(Title, id=self.context.get('title_id'))
-    #         author = self.context['request'].user
-    #         if Review.objects.filter(
-    #                 title_id=title,
-    #                 author_id=author).exists():
-    #             raise serializers.ValidationError(
-    #                 'You have already left a review for this title!')  # ?
-    #     return attrs
 
     class Meta:
         model = Review
