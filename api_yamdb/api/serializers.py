@@ -7,11 +7,13 @@ from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
 
     def validate_username(self, value):
         if value.lower() == 'me':
@@ -25,7 +27,8 @@ class UserRoleReadOnlySerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
         read_only_fields = ['role']
 
 
@@ -41,7 +44,8 @@ class AuthSignupSerializer(UserSerializer):
         ).exclude(
             email=attrs.get('email')
         ).exists():
-            raise ValidationError('Such user is already registered with different email')
+            raise ValidationError(
+                'Such user is already registered with different email')
         return super().validate(attrs)
 
 
