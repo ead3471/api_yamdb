@@ -9,12 +9,14 @@ from artworks.models import Title, Review, Comment
 
 User = get_user_model()
 
+
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField()
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'description', 'rating', 'created_at')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'rating', 'genre', 'category',)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

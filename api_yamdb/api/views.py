@@ -98,7 +98,7 @@ class AuthViewSet(GenericViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score')).order_by('id')
     serializer_class = TitleSerializer
 
     def perform_create(self, serializer):

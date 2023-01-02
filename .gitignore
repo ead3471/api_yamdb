@@ -152,3 +152,4 @@ media/
 static/
 template/
 manage.py
+sent_emails/*.
