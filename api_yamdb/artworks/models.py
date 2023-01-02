@@ -37,7 +37,6 @@ class Review(models.Model):
     score = models.IntegerField(
         verbose_name="Score of the title",
         blank=False,
-        default=0,
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
     pub_date = models.DateTimeField(
