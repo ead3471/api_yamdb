@@ -4,7 +4,7 @@ from .models import Title, Genre, Category, Review, Comment
 
 class TitleAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'name', 'description',
-                    'rating', 'category', 'get_genres')
+                    'category', 'get_genres')
     empty_value_display = '-пусто-'
 
     def get_genres(self, title: Title):

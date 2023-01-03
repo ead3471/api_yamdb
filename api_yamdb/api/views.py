@@ -7,12 +7,13 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
+from django.db.models import Avg
 from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet
 )
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from artworks.models import Title
 from api.permissions import IsAdmin, IsAuthorModerAdmin
 from api.serializers import (
     AuthSignupSerializer, AuthTokenSerializer,
