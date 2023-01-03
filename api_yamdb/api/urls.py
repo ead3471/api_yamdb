@@ -6,7 +6,6 @@ from .views import (UserViewSet,
 
 router_api_v1 = DefaultRouter()
 
-
 router_api_v1 = DefaultRouter()
 router_api_v1.register(r'^users', UserViewSet)
 router_api_v1.register(r'^auth', AuthViewSet)
