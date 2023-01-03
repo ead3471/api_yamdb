@@ -13,8 +13,8 @@ from rest_framework.viewsets import (
     ModelViewSet
 )
 from rest_framework_simplejwt.tokens import RefreshToken
-from artworks.models import Title
-from api.permissions import IsAdmin, IsAuthorModerAdmin
+from artworks.models import Title, Review, Comment, Genre, Category
+from api.permissions import IsAdmin, IsModerator, IsAuthor, ReadOnly
 from api.serializers import (
     AuthSignupSerializer, AuthTokenSerializer,
     UserSerializer, UserRoleReadOnlySerializer,
@@ -106,7 +106,7 @@ class TitleViewSet(ModelViewSet):
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthorModerAdmin,)
+    permission_classes = (IsAuthor, IsModerator, IsAdmin, IsAdminUser)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -119,7 +119,7 @@ class ReviewViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorModerAdmin,)
+    permission_classes = (IsAuthor, IsAdmin, IsModerator, IsAdminUser)
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
