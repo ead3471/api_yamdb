@@ -5,8 +5,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from django.db.models import Avg
 import django_filters
@@ -52,6 +52,8 @@ class UserViewSet(ModelViewSet):
         serializer_class=UserRoleReadOnlySerializer
     )
     def me(self, request):
+        """ Function to process API requests with users/me/ URI.
+        """
         self.kwargs['username'] = request.user
         if request.method == "GET":
             return self.retrieve(request)
@@ -60,12 +62,14 @@ class UserViewSet(ModelViewSet):
 
 
 class AuthViewSet(GenericViewSet):
-
     queryset = User.objects.all()
     serializer_class = AuthSignupSerializer
+    permission_classes = [AllowAny]
 
     @action(["post"], detail=False)
     def signup(self, request):
+        """ Function to process API requests with auth/signup/ URI.
+        """
         try:
             user = User.objects.get(username=request.data.get('username'))
         except ObjectDoesNotExist:
@@ -90,10 +94,13 @@ class AuthViewSet(GenericViewSet):
 
     @action(["post"], detail=False)
     def token(self, request):
+        """Function to process API requests with auth/token/
+        """
         serializer = AuthTokenSerializer(data=request.data)
         if serializer.is_valid():
             user = get_object_or_404(
-                User, username=serializer.validated_data.get('username'))
+                User, username=serializer.validated_data.get('username')
+            )
             tokens = RefreshToken.for_user(user)
             return Response(
                 data={'token': str(tokens.access_token)},
