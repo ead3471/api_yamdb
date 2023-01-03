@@ -19,7 +19,7 @@ from rest_framework.viewsets import (
 
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin
 from rest_framework_simplejwt.tokens import RefreshToken
-from artworks.models import Title, Review, Comment, Genre, Category
+from reviews.models import Title, Review, Comment, Genre, Category
 from api.permissions import IsAdmin, IsModerator, IsAuthor, ReadOnly
 from api.serializers import (
     AuthSignupSerializer, AuthTokenSerializer,
@@ -152,8 +152,8 @@ class CategoryViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, DestroyM
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [ReadOnly | IsAuthor
-                          | IsModerator | IsAdmin | IsAdminUser]
+    permission_classes = [IsAdmin | IsAdminUser
+                          | IsModerator | IsAuthor | ReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')

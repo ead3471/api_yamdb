@@ -40,6 +40,9 @@ class Genre(models.Model):
 class Title(models.Model):
     MINIMUM_TITLE_YEAR = -500000  # The first known work of art
 
+    def get_current_year():
+        return datetime.now().year
+
     name = models.CharField(verbose_name="Name of art work",
                             max_length=256,
                             default='default name')
@@ -51,8 +54,7 @@ class Title(models.Model):
     year = models.IntegerField(verbose_name="Creation year",
                                validators=[
                                    MinValueValidator(MINIMUM_TITLE_YEAR),
-                                   MaxValueValidator(
-                                       lambda: datetime.now().year)],
+                                   MaxValueValidator(get_current_year())],
                                )
 
     category = models.ForeignKey(Category,

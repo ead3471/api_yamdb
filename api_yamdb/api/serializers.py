@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
-from artworks.models import Title, Review, Comment, Genre, Category
+from reviews.models import Title, Review, Comment, Genre, Category
 
 User = get_user_model()
 
@@ -22,6 +22,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField()
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
 
