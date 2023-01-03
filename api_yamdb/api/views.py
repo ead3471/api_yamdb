@@ -16,15 +16,17 @@ from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet
 )
-
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin
+from rest_framework.mixins import (ListModelMixin,
+                                   CreateModelMixin,
+                                   DestroyModelMixin)
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Title, Review, Comment, Genre, Category
 from api.permissions import IsAdmin, IsModerator, IsAuthor, ReadOnly
 from api.serializers import (
     AuthSignupSerializer, AuthTokenSerializer,
     UserSerializer, UserRoleReadOnlySerializer,
-    TitleGetSerializer, TitleModifySerializer, GenreSerializer, CategorySerializer,
+    TitleGetSerializer, TitleModifySerializer,
+    GenreSerializer, CategorySerializer,
     ReviewSerializer,
     CommentSerializer
 )
@@ -139,7 +141,10 @@ class TitleViewSet(ModelViewSet):
         return self.action_serializers.get(self.action)
 
 
-class GenreViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, DestroyModelMixin):
+class GenreViewSet(GenericViewSet,
+                   ListModelMixin,
+                   CreateModelMixin,
+                   DestroyModelMixin):
     serializer_class = GenreSerializer
     permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
     filter_backends = (SearchFilter,)
@@ -148,7 +153,10 @@ class GenreViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, DestroyMode
     queryset = Genre.objects.all()
 
 
-class CategoryViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, DestroyModelMixin):
+class CategoryViewSet(GenericViewSet,
+                      ListModelMixin,
+                      CreateModelMixin,
+                      DestroyModelMixin):
     serializer_class = CategorySerializer
     permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
     filter_backends = (SearchFilter,)
