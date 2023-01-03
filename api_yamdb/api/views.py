@@ -25,6 +25,7 @@ REGISTRATION_EMAIL_FROM = 'team15@yamdb.fake'
 
 User = get_user_model()
 
+
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -41,6 +42,8 @@ class UserViewSet(ModelViewSet):
         serializer_class=UserRoleReadOnlySerializer
     )
     def me(self, request):
+        """ Function to process API requests with users/me/ URI.
+        """
         self.kwargs['username'] = request.user
         if request.method == "GET":
             return self.retrieve(request)
@@ -49,12 +52,13 @@ class UserViewSet(ModelViewSet):
 
 
 class AuthViewSet(GenericViewSet):
-
     queryset = User.objects.all()
     serializer_class = AuthSignupSerializer
 
     @action(["post"], detail=False)
     def signup(self, request):
+        """ Function to process API requests with auth/signup/ URI.
+        """
         try:
             user = User.objects.get(username=request.data.get('username'))
         except ObjectDoesNotExist:
@@ -79,9 +83,13 @@ class AuthViewSet(GenericViewSet):
 
     @action(["post"], detail=False)
     def token(self, request):
+        """Function to process API requests with auth/token/
+        """
         serializer = AuthTokenSerializer(data=request.data)
         if serializer.is_valid():
-            user = get_object_or_404(User, username=serializer.validated_data.get('username'))
+            user = get_object_or_404(
+                User, username=serializer.validated_data.get('username')
+            )
             tokens = RefreshToken.for_user(user)
             return Response(
                 data={'token': str(tokens.access_token)},

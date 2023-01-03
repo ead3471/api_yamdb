@@ -7,25 +7,43 @@ from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):
 
+class UserSerializer(serializers.ModelSerializer):
+    """ Serializer to process other users profile management API requests.
+    """
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
 
     def validate_username(self, value):
         if value.lower() == 'me':
             raise ValidationError(
-                f'Username \'me\' is reserved, please choose another one'
+                'Username \'me\' is reserved, please choose another one'
             )
         return value
 
 
 class UserRoleReadOnlySerializer(UserSerializer):
-
+    """ Serializer to process own user profile management API requests.
+    Role field change is restricted.
+    """
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
         read_only_fields = ['role']
 
 
@@ -41,11 +59,14 @@ class AuthSignupSerializer(UserSerializer):
         ).exclude(
             email=attrs.get('email')
         ).exists():
-            raise ValidationError('Such user is already registered with different email')
+            raise ValidationError(
+                'Such user is already registered with different email'
+            )
         return super().validate(attrs)
 
 
 class AuthTokenSerializer(serializers.Serializer):
+
     username = serializers.RegexField(r'^[\w.@+-]+$', max_length=150)
     confirmation_code = serializers.CharField(max_length=40)
 
