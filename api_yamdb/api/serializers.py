@@ -4,17 +4,41 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
-from artworks.models import Title, Review, Comment
+from artworks.models import Title, Review, Comment, Genre, Category
 
 User = get_user_model()
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    rating = serializers.IntegerField()
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+
+
+class TitleGetSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'description', 'rating', 'created_at')
+        fields = ('__all__')
+
+
+class TitleModifySerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        many=True, queryset=Genre.objects.all(), slug_field='slug')
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all())
+
+    class Meta:
+        model = Title
+        fields = ('__all__')
 
 
 class ReviewSerializer(serializers.ModelSerializer):

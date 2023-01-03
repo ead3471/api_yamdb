@@ -5,20 +5,26 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from django.db.models import Avg
+import django_filters
+from django_filters import rest_framework as filters
+
 from rest_framework.viewsets import (
     GenericViewSet,
     ModelViewSet
 )
+
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin
 from rest_framework_simplejwt.tokens import RefreshToken
 from artworks.models import Title, Review, Comment, Genre, Category
 from api.permissions import IsAdmin, IsModerator, IsAuthor, ReadOnly
 from api.serializers import (
     AuthSignupSerializer, AuthTokenSerializer,
     UserSerializer, UserRoleReadOnlySerializer,
-    TitleSerializer,
+    TitleGetSerializer, TitleModifySerializer, GenreSerializer, CategorySerializer,
     ReviewSerializer,
     CommentSerializer
 )
@@ -96,17 +102,58 @@ class AuthViewSet(GenericViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class TitleFilter(django_filters.FilterSet):
+    category = filters.CharFilter(
+        field_name='category__slug', lookup_expr='exact')
+    genre = filters.CharFilter(field_name='genre__slug', lookup_expr='exact')
+
+    class Meta():
+        model = Title
+        fields = ['name', 'year']
+
+
 class TitleViewSet(ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
-    serializer_class = TitleSerializer
+    permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
+
+    action_serializers = {
+        'list': TitleGetSerializer,
+        'retrieve': TitleGetSerializer,
+        'create': TitleModifySerializer,
+        'update': TitleModifySerializer,
+        'partial_update': TitleModifySerializer,
+        'destroy': TitleModifySerializer
+    }
+
+    def get_serializer_class(self):
+        return self.action_serializers.get(self.action)
+
+
+class GenreViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, DestroyModelMixin):
+    serializer_class = GenreSerializer
+    permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    queryset = Genre.objects.all()
+
+
+class CategoryViewSet(GenericViewSet, ListModelMixin, CreateModelMixin, DestroyModelMixin):
+    serializer_class = CategorySerializer
+    permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    queryset = Category.objects.all()
 
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthor | IsModerator | IsAdmin | IsAdminUser)
+    permission_classes = [ReadOnly | IsAuthor
+                          | IsModerator | IsAdmin | IsAdminUser]
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -119,7 +166,8 @@ class ReviewViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthor | IsAdmin | IsModerator | IsAdminUser)
+    permission_classes = [ReadOnly | IsAuthor
+                          | IsAdmin | IsModerator | IsAdminUser]
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
