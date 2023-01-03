@@ -106,7 +106,7 @@ class TitleViewSet(ModelViewSet):
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthor, IsModerator, IsAdmin, IsAdminUser)
+    permission_classes = (IsAuthor | IsModerator | IsAdmin | IsAdminUser)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -119,7 +119,7 @@ class ReviewViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthor, IsAdmin, IsModerator, IsAdminUser)
+    permission_classes = (IsAuthor | IsAdmin | IsModerator | IsAdminUser)
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
