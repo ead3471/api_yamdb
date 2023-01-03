@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import (
     GenericViewSet,
@@ -54,6 +54,7 @@ class UserViewSet(ModelViewSet):
 class AuthViewSet(GenericViewSet):
     queryset = User.objects.all()
     serializer_class = AuthSignupSerializer
+    permission_classes = [AllowAny]
 
     @action(["post"], detail=False)
     def signup(self, request):
