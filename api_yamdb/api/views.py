@@ -1,32 +1,29 @@
+import django_filters
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.response import Response
-from django.db.models import Avg
-import django_filters
-from django_filters import rest_framework as filters
-from rest_framework.viewsets import (
-    GenericViewSet,
-    ModelViewSet
+from rest_framework.mixins import (
+    CreateModelMixin, DestroyModelMixin, ListModelMixin
 )
-from rest_framework.mixins import (ListModelMixin,
-                                   CreateModelMixin,
-                                   DestroyModelMixin)
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Title, Review, Comment, Genre, Category
-from api.permissions import IsAdmin, IsModerator, IsAuthor, ReadOnly
+from reviews.models import Category, Comment, Genre, Review, Title
+from api.permissions import IsAdmin, IsAuthor, IsModerator, ReadOnly
 from api.serializers import (
     AuthSignupSerializer, AuthTokenSerializer,
-    UserSerializer, UserRoleReadOnlySerializer,
+    CategorySerializer, CommentSerializer,
+    GenreSerializer, ReviewSerializer,
     TitleGetSerializer, TitleModifySerializer,
-    GenreSerializer, CategorySerializer,
-    ReviewSerializer, CommentSerializer
+    UserSerializer, UserRoleReadOnlySerializer,
 )
 
 REGISTRATION_EMAIL_SUBJECT = 'YAMDB registration.'
@@ -37,7 +34,7 @@ User = get_user_model()
 
 
 class UserViewSet(ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     lookup_field = 'username'
     http_method_names = ['get', 'post', 'patch', 'delete']

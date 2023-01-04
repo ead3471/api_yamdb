@@ -1,10 +1,10 @@
-from rest_framework.exceptions import ValidationError
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
+from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from reviews.models import Title, Review, Comment, Genre, Category
+from reviews.models import Category, Comment, Genre, Review, Title
 
 User = get_user_model()
 
@@ -141,7 +141,7 @@ class AuthSignupSerializer(UserSerializer):
 class AuthTokenSerializer(serializers.Serializer):
 
     username = serializers.RegexField(r'^[\w.@+-]+$', max_length=150)
-    confirmation_code = serializers.CharField(max_length=40)
+    confirmation_code = serializers.CharField()
 
     def validate(self, attrs):
         token = attrs.get('confirmation_code')
