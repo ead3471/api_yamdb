@@ -6,7 +6,7 @@ class IsAdmin(BasePermission):
         return request.user.is_authenticated and request.user.role == 'admin'
 
     def has_object_permission(self, request, view, obj):
-        return request.user.role == 'admin'
+        return request.user.is_authenticated and request.user.role == 'admin'
 
 
 class IsModerator(BasePermission):
@@ -16,7 +16,9 @@ class IsModerator(BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
-        return request.user.role == 'moderator'
+        return (
+            request.user.is_authenticated and request.user.role == 'moderator'
+        )
 
 
 class IsAuthor(BasePermission):
@@ -25,7 +27,8 @@ class IsAuthor(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return (
-            request.user.role == 'user'
+            request.user.is_authenticated
+            and request.user.role == 'user'
             and (request.method in SAFE_METHODS or obj.author == request.user)
         )
 
