@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import (MaxValueValidator,
                                     MinValueValidator,
                                     RegexValidator)
-import datetime
+from datetime import datetime
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 User = get_user_model()
 
@@ -39,17 +40,21 @@ class Genre(models.Model):
 class Title(models.Model):
     MINIMUM_TITLE_YEAR = -500000  # The first known work of art
 
+    def get_current_year():
+        return datetime.now().year
+
     name = models.CharField(verbose_name="Name of art work",
                             max_length=256,
                             default='default name')
+
     description = models.TextField(verbose_name="Short description",
                                    null=True,
                                    blank=True)
+
     year = models.IntegerField(verbose_name="Creation year",
                                validators=[
                                    MinValueValidator(MINIMUM_TITLE_YEAR),
-                                   MaxValueValidator(
-                                       datetime.date.today().year)],
+                                   MaxValueValidator(get_current_year())],
                                )
 
     category = models.ForeignKey(Category,
@@ -63,6 +68,9 @@ class Title(models.Model):
                                    related_name="titles",
                                    blank=True,
                                    )
+
+    def __str__(self):
+        return self.name
 
 
 class Review(models.Model):
@@ -84,6 +92,7 @@ class Review(models.Model):
     score = models.IntegerField(
         verbose_name="Score of the title",
         blank=False,
+        default=0,
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
     pub_date = models.DateTimeField(
@@ -112,7 +121,7 @@ class Comment(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name="Author",
-        related_name='сomments',
+        related_name='сomments'
     )
     pub_date = models.DateTimeField(
         verbose_name="Publication date",
