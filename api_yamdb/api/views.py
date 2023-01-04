@@ -7,8 +7,6 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from django.db.models import Avg
 import django_filters
@@ -20,12 +18,7 @@ from rest_framework.viewsets import (
 from rest_framework.mixins import (ListModelMixin,
                                    CreateModelMixin,
                                    DestroyModelMixin)
-from rest_framework.mixins import (ListModelMixin,
-                                   CreateModelMixin,
-                                   DestroyModelMixin)
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Title, Review, Comment, Genre, Category
-from api.permissions import IsAdmin, IsModerator, IsAuthor, ReadOnly
 from reviews.models import Title, Review, Comment, Genre, Category
 from api.permissions import IsAdmin, IsModerator, IsAuthor, ReadOnly
 from api.serializers import (
@@ -33,13 +26,7 @@ from api.serializers import (
     UserSerializer, UserRoleReadOnlySerializer,
     TitleGetSerializer, TitleModifySerializer,
     GenreSerializer, CategorySerializer,
-    ReviewSerializer,
-    CommentSerializer
-    UserSerializer, UserRoleReadOnlySerializer,
-    TitleGetSerializer, TitleModifySerializer,
-    GenreSerializer, CategorySerializer,
-    ReviewSerializer,
-    CommentSerializer
+    ReviewSerializer, CommentSerializer
 )
 
 REGISTRATION_EMAIL_SUBJECT = 'YAMDB registration.'
@@ -47,7 +34,6 @@ REGISTRATION_EMAIL_FROM = 'team15@yamdb.fake'
 
 
 User = get_user_model()
-
 
 
 class UserViewSet(ModelViewSet):
@@ -154,20 +140,7 @@ class TitleViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return self.action_serializers.get(self.action)
-    def get_serializer_class(self):
-        return self.action_serializers.get(self.action)
 
-
-class GenreViewSet(GenericViewSet,
-                   ListModelMixin,
-                   CreateModelMixin,
-                   DestroyModelMixin):
-    serializer_class = GenreSerializer
-    permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
-    filter_backends = (SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
-    queryset = Genre.objects.all()
 
 class GenreViewSet(GenericViewSet,
                    ListModelMixin,
@@ -191,19 +164,8 @@ class CategoryViewSet(GenericViewSet,
     search_fields = ('name',)
     lookup_field = 'slug'
     queryset = Category.objects.all()
-class CategoryViewSet(GenericViewSet,
-                      ListModelMixin,
-                      CreateModelMixin,
-                      DestroyModelMixin):
-    serializer_class = CategorySerializer
-    permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
-    filter_backends = (SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
-    queryset = Category.objects.all()
 
 
-class ReviewViewSet(ModelViewSet):
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthor | IsModerator | IsAdmin | ReadOnly]
@@ -218,7 +180,6 @@ class ReviewViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class CommentViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthor | IsModerator | IsAdmin | ReadOnly]
