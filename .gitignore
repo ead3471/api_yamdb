@@ -148,3 +148,8 @@ dmypy.json
 # папки со статикой и медиа
 media/
 
+# ещё игнорь
+static/
+template/
+manage.py
+sent_emails/*.

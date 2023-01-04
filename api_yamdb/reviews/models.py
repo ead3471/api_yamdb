@@ -4,6 +4,7 @@ from django.core.validators import (MaxValueValidator,
                                     MinValueValidator,
                                     RegexValidator)
 from datetime import datetime
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 User = get_user_model()
 
@@ -39,6 +40,9 @@ class Genre(models.Model):
 class Title(models.Model):
     MINIMUM_TITLE_YEAR = -500000  # The first known work of art
 
+    def get_current_year():
+        return datetime.now().year
+
     name = models.CharField(verbose_name="Name of art work",
                             max_length=256,
                             default='default name')
@@ -47,16 +51,10 @@ class Title(models.Model):
                                    null=True,
                                    blank=True)
 
-    rating = models.DecimalField(verbose_name="Raiting",
-                                 max_digits=2,
-                                 decimal_places=1,
-                                 default=0)
-
     year = models.IntegerField(verbose_name="Creation year",
                                validators=[
                                    MinValueValidator(MINIMUM_TITLE_YEAR),
-                                   MaxValueValidator(
-                                       lambda: datetime.now().year)],
+                                   MaxValueValidator(get_current_year())],
                                )
 
     category = models.ForeignKey(Category,
@@ -71,5 +69,63 @@ class Title(models.Model):
                                    blank=True,
                                    )
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
+
+
+class Review(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    text = models.TextField(
+        verbose_name="Review text",
+        blank=False
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Author",
+        related_name='reviews'
+    )
+    score = models.IntegerField(
+        verbose_name="Score of the title",
+        blank=False,
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
+    )
+    pub_date = models.DateTimeField(
+        verbose_name="Publication date",
+        auto_now_add=True
+    )
+
+    class Meta:
+        unique_together = ['title', 'author']
+
+    def __str__(self):
+        return self.text
+
+
+class Comment(models.Model):
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='сomments',
+    )
+    text = models.TextField(
+        verbose_name="Сomment text",
+        blank=False
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Author",
+        related_name='сomments'
+    )
+    pub_date = models.DateTimeField(
+        verbose_name="Publication date",
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.text
