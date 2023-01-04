@@ -65,19 +65,6 @@ class Title(models.Model):
                                    )
 
 
-# class Title(models.Model):
-#     name = models.TextField(verbose_name="Name")
-#     description = models.TextField(verbose_name="Short description",
-#                                    null=True,
-#                                    blank=True)
-
-#     created_at = models.DateTimeField(verbose_name="Creation year",
-#                                       auto_now_add=True)
-
-#     def __str__(self):
-#         return self.name
-
-
 class Review(models.Model):
     title = models.ForeignKey(
         Title,
@@ -125,7 +112,7 @@ class Comment(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name="Author",
-        related_name='сomments'
+        related_name='сomments',
     )
     pub_date = models.DateTimeField(
         verbose_name="Publication date",

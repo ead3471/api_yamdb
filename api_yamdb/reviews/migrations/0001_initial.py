@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(default='default name', max_length=256, verbose_name='Name of art work')),
                 ('description', models.TextField(blank=True, null=True, verbose_name='Short description')),
                 ('year', models.IntegerField(validators=[django.core.validators.MinValueValidator(-500000), django.core.validators.MaxValueValidator(2023)], verbose_name='Creation year')),
-                ('category', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='titles', to='artworks.category', verbose_name='Category')),
+                ('category', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='titles', to='reviews.category', verbose_name='Category')),
             ],
         ),
     ]

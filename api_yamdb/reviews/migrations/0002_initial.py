@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('artworks', '0001_initial'),
+        ('reviews', '0001_initial'),
     ]
 
     operations = [
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='review',
             name='title',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='artworks.title'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.title'),
         ),
         migrations.AddField(
             model_name='comment',
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='comment',
             name='review',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='сomments', to='artworks.review'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='сomments', to='reviews.review'),
         ),
         migrations.AlterUniqueTogether(
             name='review',
