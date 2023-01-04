@@ -1,13 +1,17 @@
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from artworks.models import Category, Genre, Title#, Comment, Review
+from reviews.models import Category, Comment, Genre, Review, Title
+
+User = get_user_model()
 
 MODELS = {
-    'Category': Category,
-#    'Comment': Comment,
-    'Genre': Genre,
-#    'Review': Review,
-    'Title': Title,
+    'category': Category,
+    'comment': Comment,
+    'genre': Genre,
+    'review': Review,
+    'title': Title,
+    'user': User
 }
 
 class Command(BaseCommand):
@@ -46,4 +50,4 @@ class Command(BaseCommand):
                 confirmation = input('Please confirm [y/n]: ')
                 if confirmation == 'n':
                     continue
-            self.clear_model(model)
+            self.clear_model(model.lower())
