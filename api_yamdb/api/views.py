@@ -116,11 +116,13 @@ class TitleFilter(django_filters.FilterSet):
 
 
 class TitleViewSet(ModelViewSet):
-    queryset = (
-        Title.objects.all().
-        annotate(rating=Avg('reviews__score')).
-        order_by('id')
-    )
+    queryset = (Title.
+                objects.
+                prefetch_related('genre').
+                select_related('category').
+                annotate(rating=Avg('reviews__score')).
+                order_by('id')
+                )
     permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
 
     filter_backends = (DjangoFilterBackend,)
@@ -174,7 +176,6 @@ class ReviewViewSet(ModelViewSet):
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
         serializer.save(author=self.request.user, title_id=title_id)
-        serializer.save(author=self.request.user)
 
 
 class CommentViewSet(ModelViewSet):
