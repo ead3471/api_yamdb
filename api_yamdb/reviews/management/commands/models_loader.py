@@ -23,8 +23,6 @@ class ModelLoader:
 
     def remove(self):
         self.model_class.objects.all().delete()
-        table_name = self.model_class.objects.model._meta.db_table
-        print(table_name)
 
     def show(self):
         for object in self.model_class.objects.all():
