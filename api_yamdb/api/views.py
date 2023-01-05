@@ -1,10 +1,8 @@
-import django_filters
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
@@ -25,6 +23,7 @@ from api.serializers import (
     TitleGetSerializer, TitleModifySerializer,
     UserSerializer, UserRoleReadOnlySerializer,
 )
+from .filters import TitleFilter
 
 REGISTRATION_EMAIL_SUBJECT = 'YAMDB registration.'
 REGISTRATION_EMAIL_FROM = 'team15@yamdb.fake'
@@ -103,16 +102,6 @@ class AuthViewSet(GenericViewSet):
                 status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class TitleFilter(django_filters.FilterSet):
-    category = filters.CharFilter(
-        field_name='category__slug', lookup_expr='exact')
-    genre = filters.CharFilter(field_name='genre__slug', lookup_expr='exact')
-
-    class Meta():
-        model = Title
-        fields = ['name', 'year']
 
 
 class TitleViewSet(ModelViewSet):
