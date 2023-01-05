@@ -18,8 +18,11 @@ class ModelLoader:
     def load(self):
         with open(self.file_location, 'r') as data_file:
             csvreader = csv.DictReader(data_file, delimiter=',')
+            objects_list = []
             for row in csvreader:
-                self.model_class.objects.update_or_create(**row)
+                objects_list.append(**row)
+
+            self.model_class.objects.bulk_create(objects_list)
 
     def remove(self):
         self.model_class.objects.all().delete()
