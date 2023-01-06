@@ -3,7 +3,6 @@ from reviews.models import Category, Genre, Title, Review, Comment
 import csv
 import pathlib
 from django.db.models.base import ModelBase
-from django.db.models import Model
 from django.contrib.auth import get_user_model
 from typing import Dict
 User = get_user_model()
@@ -20,9 +19,10 @@ class ModelLoader:
             csvreader = csv.DictReader(data_file, delimiter=',')
             objects_list = []
             for row in csvreader:
-                objects_list.append(**row)
+                objects_list.append(self.model_class(**row))
 
-            self.model_class.objects.bulk_create(objects_list)
+            self.model_class.objects.bulk_create(
+                objects_list, ignore_conflicts=True)
 
     def remove(self):
         self.model_class.objects.all().delete()
@@ -44,25 +44,44 @@ class TitlesLoader(ModelLoader):
         self.help = help
 
     def load(self):
+        titles_list = []
         with open(self.titles_file, 'r') as data_file:
             csvreader = csv.DictReader(data_file, delimiter=',')
             for row in csvreader:
                 if 'category' in row:
-                    category = Category.objects.get(id=row['category'])
-                self.model_class.objects.update_or_create(
-                    name=row['name'],
-                    category=category,
-                    year=row['year']
-                )
+                    row['category'] = Category.objects.get(pk=row['category'])
+                titles_list.append(Title(**row))
 
-        # with open(self.genre_titles_file, 'r') as genres_file:
-        #     csvreader = csv.DictReader(genres_file, delimiter=',')
-        #     for row in csvreader:
-        #         title_id = row['title_id']
-        #         genre_id = row['genre_id']
-        #         print(f'{genre_id}->{title_id}')
-        #         Title.objects.get(id=title_id).genre.add(
-        #             row['genre_id'])
+        Title.objects.bulk_create(titles_list,
+                                  ignore_conflicts=True)
+
+        with open(self.genre_titles_file, 'r') as genres_file:
+            csvreader = csv.DictReader(genres_file, delimiter=',')
+            for row in csvreader:
+                title_id = row['title_id']
+                genre_id = row['genre_id']
+                Title.objects.get(id=title_id).genre.add(genre_id)
+
+
+class ModelWithForeignKeysLoader(ModelLoader):
+    def __init__(self, model_class: ModelBase, file_location: str, foreign_keys_map: Dict[str, ModelBase], help: str) -> None:
+        self.foreign_keys_map: Dict(str, ModelBase) = foreign_keys_map
+        super().__init__(model_class, file_location, help)
+
+    def load(self):
+        objects_list = []
+        with open(self.file_location, 'r') as data_file:
+            csvreader = csv.DictReader(data_file, delimiter=',')
+            for row in csvreader:
+                for column, model_name in self.foreign_keys_map.items():
+                    if column in row:
+                        row[column] = model_name.objects.get(
+                            pk=int(row[column]))
+
+                objects_list.append(self.model_class(**row))
+
+        self.model_class.objects.bulk_create(objects_list,
+                                             ignore_conflicts=True)
 
 
 class Command(BaseCommand):
@@ -75,9 +94,9 @@ class Command(BaseCommand):
         "category": ModelLoader(Category, base_data_file_location / "category.csv", "Load Categories"),
         "user": ModelLoader(User, base_data_file_location / "users.csv", "Load Users"),
         "genre": ModelLoader(Genre, base_data_file_location / "genre.csv", "Load Genres"),
-        "comment": ModelLoader(Comment, base_data_file_location / "comments.csv", "Load Comments"),
+        "comment": ModelWithForeignKeysLoader(Comment, base_data_file_location / "comments.csv", {"review": Review, 'author': User}, "Load Comments"),
         "title": TitlesLoader(base_data_file_location / "titles.csv", base_data_file_location / "genre_title.csv", "Load Titles"),
-        "review": ModelLoader(Review, base_data_file_location / "review.csv", "Load Reviews"),
+        "review": ModelWithForeignKeysLoader(Review, base_data_file_location / "review.csv", {"title": Title, 'author': User}, "Load Reviews"),
     }
 
     def add_arguments(self, parser: CommandParser):
