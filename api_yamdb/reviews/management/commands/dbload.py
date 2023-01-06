@@ -25,7 +25,7 @@ class Command(BaseCommand):
             reader = csv.DictReader(in_file)
             for row in reader:
                 rows_list.append(MODELS[model_name][0](**row))
-        MODELS[model_name][0].objects.bulk_create(rows_list)
+        MODELS[model_name][0].objects.bulk_create(rows_list, ignore_conflicts=True)
 
 
     def add_arguments(self, parser):
