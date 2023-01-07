@@ -1,4 +1,8 @@
-from ._private import ModelLoader, TitleLoader, ModelWithFKLoader
+from ._private import (ModelLoader,
+                       TitleLoader,
+                       ModelWithFKLoader,
+                       load_models,
+                       delete_models)
 from django.core.management.base import BaseCommand, CommandParser
 from reviews.models import Category, Genre, Title, Review, Comment
 import pathlib
@@ -14,41 +18,62 @@ class Command(BaseCommand):
                                / "data")
 
     loaders_dict: Dict[str, ModelLoader] = {
-        "category": ModelLoader(Category,
-                                base_data_file_location / "category.csv",
-                                "Load Categories"),
         "user": ModelLoader(User,
                             base_data_file_location / "users.csv",
                             "Load Users"),
+
+        "category": ModelLoader(Category,
+                                base_data_file_location / "category.csv",
+                                "Load Categories"),
+
         "genre": ModelLoader(Genre,
                              base_data_file_location / "genre.csv",
                              "Load Genres"),
-        "comment": ModelWithFKLoader(Comment,
-                                     base_data_file_location / "comments.csv",
-                                     {"review": Review, 'author': User},
-                                     "Load Comments"),
+
         "title": TitleLoader(base_data_file_location / "titles.csv",
                              base_data_file_location / "genre_title.csv",
                              "Load Titles"),
+
         "review": ModelWithFKLoader(Review,
                                     base_data_file_location / "review.csv",
                                     {"title": Title, 'author': User},
                                     "Load Reviews"),
+
+        "comment": ModelWithFKLoader(Comment,
+                                     base_data_file_location / "comments.csv",
+                                     {"review": Review, 'author': User},
+                                     "Load Comments"),
+
+
     }
 
+    creation_order = [
+        'user',
+        'category',
+        'genre',
+        'title',
+        'review',
+        'comment'
+    ]
+
     def add_arguments(self, parser: CommandParser):
+
+        parser.add_argument('--all',
+                            action='store_true',
+                            help='Flag for operations with all models')
+
         parser.add_argument('--load',
                             action='store_true',
-                            help='Load all data from file')
+                            help='Load all data for model from file')
         parser.add_argument('--show',
                             action='store_true',
-                            help='Show all categories')
+                            help='Show all model instances')
         parser.add_argument('--delete',
                             action='store_true',
-                            help='Delete all categories')
+                            help='Delete all model instances')
         parser.add_argument('--reload',
                             action='store_true',
-                            help='Reload all categories')
+                            help='Reload all model instances')
 
         for command, loader in self.loaders_dict.items():
             parser.add_argument(f'--{command}',
@@ -56,6 +81,27 @@ class Command(BaseCommand):
                                 help=loader)
 
     def handle(self, *args, **options):
+
+        if options['all']:
+            creation_loaders = [self.loaders_dict[model_name]
+                                for model_name in self.creation_order]
+            removing_loaders = list(creation_loaders)
+            removing_loaders.reverse()
+
+            if options['load']:
+                load_models(creation_loaders)
+                return
+
+            if options['delete']:
+                delete_models(removing_loaders)
+                return
+
+            if options['reload']:
+                delete_models(removing_loaders)
+                load_models(creation_loaders)
+
+            return
+
         model_loader = None
         for command in self.loaders_dict.keys():
             if options[command]:

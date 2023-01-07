@@ -1,6 +1,6 @@
 from reviews.models import Category, Title
 from django.db.models.base import ModelBase
-from typing import Dict
+from typing import Dict, List
 import csv
 
 
@@ -33,6 +33,9 @@ class ModelLoader:
     def reload(self):
         self.remove()
         self.load()
+
+    def __str__(self):
+        return str(self.model_class.__name__)
 
 
 class TitleLoader(ModelLoader):
@@ -88,3 +91,13 @@ class ModelWithFKLoader(ModelLoader):
 
         self.model_class.objects.bulk_create(objects_list,
                                              ignore_conflicts=True)
+
+
+def load_models(models: List[ModelLoader]):
+    for model in models:
+        model.load()
+
+
+def delete_models(models: List[ModelLoader]):
+    for model in models:
+        model.remove()
