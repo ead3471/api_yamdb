@@ -14,7 +14,7 @@ class ModelLoader:
         self.help = help
 
     def load(self):
-        with open(self.file_location, 'r') as data_file:
+        with open(self.file_location, 'r', 1, 'utf8') as data_file:
             csvreader = csv.DictReader(data_file, delimiter=',')
             objects_list = []
             for row in csvreader:
@@ -47,7 +47,7 @@ class TitleLoader(ModelLoader):
 
     def load(self):
         titles_list = []
-        with open(self.titles_file, 'r') as data_file:
+        with open(self.titles_file, 'r', 1, 'utf8') as data_file:
             csvreader = csv.DictReader(data_file, delimiter=',')
             for row in csvreader:
                 if 'category' in row:
@@ -57,7 +57,7 @@ class TitleLoader(ModelLoader):
         Title.objects.bulk_create(titles_list,
                                   ignore_conflicts=True)
 
-        with open(self.genre_titles_file, 'r') as genres_file:
+        with open(self.genre_titles_file, 'r', 1, 'utf8') as genres_file:
             csvreader = csv.DictReader(genres_file, delimiter=',')
             for row in csvreader:
                 title_id = row['title_id']
@@ -76,7 +76,7 @@ class ModelWithFKLoader(ModelLoader):
 
     def load(self):
         objects_list = []
-        with open(self.file_location, 'r') as data_file:
+        with open(self.file_location, 'r', 1, 'utf8') as data_file:
             csvreader = csv.DictReader(data_file, delimiter=',')
             for row in csvreader:
                 for column, model_name in self.foreign_keys_map.items():
