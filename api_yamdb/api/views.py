@@ -139,7 +139,7 @@ class GenreViewSet(GenericViewSet,
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    queryset = Genre.objects.all()
+    queryset = Genre.objects.all().order_by('id')
 
 
 class CategoryViewSet(GenericViewSet,
@@ -151,7 +151,7 @@ class CategoryViewSet(GenericViewSet,
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('id')
 
 
 class ReviewViewSet(ModelViewSet):
