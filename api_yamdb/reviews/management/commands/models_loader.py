@@ -80,28 +80,25 @@ class Command(BaseCommand):
                                 action='store_true',
                                 help=loader)
 
-    def handle(self, *args, **options):
+    def process_all_models(self, options):
+        creation_loaders = [self.loaders_dict[model_name]
+                            for model_name in self.creation_order]
+        removing_loaders = list(creation_loaders)
+        removing_loaders.reverse()
 
-        if options['all']:
-            creation_loaders = [self.loaders_dict[model_name]
-                                for model_name in self.creation_order]
-            removing_loaders = list(creation_loaders)
-            removing_loaders.reverse()
-
-            if options['load']:
-                load_models(creation_loaders)
-                return
-
-            if options['delete']:
-                delete_models(removing_loaders)
-                return
-
-            if options['reload']:
-                delete_models(removing_loaders)
-                load_models(creation_loaders)
-
+        if options['load']:
+            load_models(creation_loaders)
             return
 
+        if options['delete']:
+            delete_models(removing_loaders)
+            return
+
+        if options['reload']:
+            delete_models(removing_loaders)
+            load_models(creation_loaders)
+
+    def process_inividual_model(self, options):
         model_loader = None
         for command in self.loaders_dict.keys():
             if options[command]:
@@ -130,3 +127,11 @@ class Command(BaseCommand):
             return
 
         print("Action is not set")
+
+    def handle(self, *args, **options):
+
+        if options['all']:
+            self.process_all_models(options)
+            return
+
+        self.process_inividual_model(options)
