@@ -133,3 +133,5 @@ SIMPLE_JWT = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+REGISTRATION_EMAIL_SUBJECT = 'YAMDB registration.'
+REGISTRATION_EMAIL_FROM = 'team15@yamdb.fake'
