@@ -2,15 +2,17 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-USER_ROLES = (
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin')
-)
-DEFAULT_USER_ROLE = 'user'
-
-
 class User(AbstractUser):
+    USER_ROLE_NAME = 'user'
+    MODERATOR_ROLE_NAME = 'moderator'
+    ADMIN_ROLE_NAME = 'admin'
+
+    AVAILABLE_USER_ROLES = (
+        (USER_ROLE_NAME, 'User'),
+        (MODERATOR_ROLE_NAME, 'Moderator'),
+        (ADMIN_ROLE_NAME, 'Admin')
+    )
+
     email = models.EmailField(
         'Email address',
         unique=True,
@@ -24,6 +26,6 @@ class User(AbstractUser):
     role = models.CharField(
         'Role',
         max_length=20,
-        default=DEFAULT_USER_ROLE,
-        choices=USER_ROLES,
+        default=USER_ROLE_NAME,
+        choices=AVAILABLE_USER_ROLES,
     )
