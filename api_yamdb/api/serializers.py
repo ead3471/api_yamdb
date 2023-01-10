@@ -75,9 +75,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         get_object_or_404(
-            Title, id=self.context['view'].kwargs.get('title_id'))
-        get_object_or_404(
-            Review, id=self.context['view'].kwargs.get('review_id'))
+            Review,
+            title_id=self.context['view'].kwargs.get('title_id'),
+            id=self.context['view'].kwargs.get('review_id')
+        )
         return attrs
 
 
