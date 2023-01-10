@@ -107,18 +107,19 @@ class UserSerializer(serializers.ModelSerializer):
             username__iexact=attrs.get('username')
         ).exists():
             raise ValidationError(
-                f'Such username is already registered, '
-                f'please choose another one.'
+                'Such username is already registered, '
+                'please choose another one.'
             )
 
         if User.objects.filter(
             email__iexact=attrs.get('email')
         ).exists():
             raise ValidationError(
-                f'Such email is already registered, '
-                f'please choose another one.'
+                'Such email is already registered, '
+                'please choose another one.'
             )
         return attrs
+
 
 class UserRoleReadOnlySerializer(UserSerializer):
     """ Serializer to process own user profile management API requests.
@@ -162,6 +163,7 @@ class AuthSignupSerializer(UserSerializer):
                 'Such email is already registered for different user'
             )
         return attrs
+
 
 class AuthTokenSerializer(serializers.Serializer):
 

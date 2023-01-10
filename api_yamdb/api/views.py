@@ -65,7 +65,9 @@ class AuthViewSet(GenericViewSet):
         """ Function to process API requests with auth/signup/ URI.
         """
         try:
-            user = User.objects.get(username__iexact=request.data.get('username'))
+            user = User.objects.get(
+                username__iexact=request.data.get('username')
+            )
         except ObjectDoesNotExist:
             serializer = AuthSignupSerializer(data=request.data)
         else:
