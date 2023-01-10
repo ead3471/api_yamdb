@@ -102,6 +102,23 @@ class UserSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate(self, attrs):
+        if User.objects.filter(
+            username__iexact=attrs.get('username')
+        ).exists():
+            raise ValidationError(
+                f'Such username is already registered, '
+                f'please choose another one.'
+            )
+
+        if User.objects.filter(
+            email__iexact=attrs.get('email')
+        ).exists():
+            raise ValidationError(
+                f'Such email is already registered, '
+                f'please choose another one.'
+            )
+        return attrs
 
 class UserRoleReadOnlySerializer(UserSerializer):
     """ Serializer to process own user profile management API requests.
@@ -128,15 +145,23 @@ class AuthSignupSerializer(UserSerializer):
 
     def validate(self, attrs):
         if User.objects.filter(
-            username=attrs.get('username')
+            username__iexact=attrs.get('username')
         ).exclude(
-            email=attrs.get('email')
+            email__iexact=attrs.get('email')
         ).exists():
             raise ValidationError(
                 'Such user is already registered with different email'
             )
-        return super().validate(attrs)
 
+        if User.objects.filter(
+            email__iexact=attrs.get('email')
+        ).exclude(
+            username__iexact=attrs.get('username')
+        ).exists():
+            raise ValidationError(
+                'Such email is already registered for different user'
+            )
+        return attrs
 
 class AuthTokenSerializer(serializers.Serializer):
 
@@ -148,4 +173,4 @@ class AuthTokenSerializer(serializers.Serializer):
         user = get_object_or_404(User, username=attrs.get('username'))
         if not default_token_generator.check_token(user, token):
             raise ValidationError('Invalid token')
-        return super().validate(attrs)
+        return attrs
