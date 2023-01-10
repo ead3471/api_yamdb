@@ -29,3 +29,15 @@ class User(AbstractUser):
         default=USER_ROLE_NAME,
         choices=AVAILABLE_USER_ROLES,
     )
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN_ROLE_NAME
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR_ROLE_NAME
+
+    @property
+    def is_user(self):
+        return self.role == self.USER_ROLE_NAME

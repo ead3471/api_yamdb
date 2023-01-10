@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Category, Comment, Genre, Review, Title
-from api.permissions import IsAdmin, IsAuthor, IsModerator, ReadOnly
+from api.permissions import IsAdmin, IsAuthor, IsModerator, IsUser, ReadOnly
 from api.serializers import (
     AuthSignupSerializer, AuthTokenSerializer,
     CategorySerializer, CommentSerializer,
@@ -154,7 +154,7 @@ class CategoryViewSet(GenericViewSet,
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthor | IsModerator | IsAdmin | ReadOnly]
+    permission_classes = [IsUser & IsAuthor | IsModerator | IsAdmin | ReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -167,7 +167,7 @@ class ReviewViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthor | IsModerator | IsAdmin | ReadOnly]
+    permission_classes = [IsUser & IsAuthor | IsModerator | IsAdmin | ReadOnly]
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
