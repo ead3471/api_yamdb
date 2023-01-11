@@ -7,4 +7,4 @@ def validate_creation_year(value):
     if value < MINIMUM_TITLE_YEAR or value > datetime.now().year:
         raise ValidationError(
             f'The year value must be between {MINIMUM_TITLE_YEAR}'
-            'and {datetime.now().year}')
+            f' and {datetime.now().year}')
