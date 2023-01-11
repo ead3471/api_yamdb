@@ -3,7 +3,9 @@ from ._private import (ModelLoader,
                        ModelWithFKLoader,
                        load_models,
                        delete_models)
-from django.core.management.base import BaseCommand, CommandParser, CommandError
+from django.core.management.base import (BaseCommand,
+                                         CommandParser,
+                                         CommandError)
 from reviews.models import Category, Genre, Title, Review, Comment
 import pathlib
 from django.contrib.auth import get_user_model
