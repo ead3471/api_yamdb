@@ -130,10 +130,18 @@ class TitleViewSet(ModelViewSet):
         return self.action_serializers.get(self.action)
 
 
-class GenreViewSet(GenericViewSet,
-                   ListModelMixin,
-                   CreateModelMixin,
-                   DestroyModelMixin):
+class ListCreateDestroyViewSet(GenericViewSet,
+                               ListModelMixin,
+                               CreateModelMixin,
+                               DestroyModelMixin):
+    """
+        General class for views with only
+        List, Create and Destroy functionality
+    """
+    pass
+
+
+class GenreViewSet(ListCreateDestroyViewSet):
     serializer_class = GenreSerializer
     permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
     filter_backends = (SearchFilter,)
@@ -142,10 +150,7 @@ class GenreViewSet(GenericViewSet,
     queryset = Genre.objects.all().order_by('id')
 
 
-class CategoryViewSet(GenericViewSet,
-                      ListModelMixin,
-                      CreateModelMixin,
-                      DestroyModelMixin):
+class CategoryViewSet(ListCreateDestroyViewSet):
     serializer_class = CategorySerializer
     permission_classes = [ReadOnly | IsAdmin | IsAdminUser]
     filter_backends = (SearchFilter,)

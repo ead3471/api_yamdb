@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.core.validators import (MaxValueValidator,
-                                    MinValueValidator,
-                                    RegexValidator)
-from datetime import datetime
+from .validators import validate_creation_year
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 User = get_user_model()
 
@@ -13,10 +12,7 @@ class Category(models.Model):
                             max_length=256)
     slug = models.SlugField(verbose_name="Category slug",
                             max_length=50,
-                            unique=True,
-                            validators=[
-                                RegexValidator(regex="^[-a-zA-Z0-9_]+$")
-                            ])
+                            unique=True)
 
     def __str__(self) -> str:
         return self.name
@@ -27,21 +23,13 @@ class Genre(models.Model):
                             max_length=256)
     slug = models.SlugField(verbose_name="Genre slug",
                             max_length=50,
-                            unique=True,
-                            validators=[
-                                RegexValidator(regex="^[-a-zA-Z0-9_]+$")
-                            ])
+                            unique=True)
 
     def __str__(self) -> str:
         return self.name
 
 
 class Title(models.Model):
-    MINIMUM_TITLE_YEAR = -500000  # The first known work of art
-
-    def get_current_year():
-        return datetime.now().year
-
     name = models.CharField(verbose_name="Name of art work",
                             max_length=256,
                             default='default name')
@@ -51,10 +39,7 @@ class Title(models.Model):
                                    blank=True)
 
     year = models.IntegerField(verbose_name="Creation year",
-                               validators=[
-                                   MinValueValidator(MINIMUM_TITLE_YEAR),
-                                   MaxValueValidator(get_current_year())],
-                               )
+                               validators=[validate_creation_year])
 
     category = models.ForeignKey(Category,
                                  verbose_name='Category',
