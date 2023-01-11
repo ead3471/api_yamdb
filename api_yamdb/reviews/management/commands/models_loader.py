@@ -3,7 +3,7 @@ from ._private import (ModelLoader,
                        ModelWithFKLoader,
                        load_models,
                        delete_models)
-from django.core.management.base import BaseCommand, CommandParser
+from django.core.management.base import BaseCommand, CommandParser, CommandError
 from reviews.models import Category, Genre, Title, Review, Comment
 import pathlib
 from django.contrib.auth import get_user_model
@@ -97,6 +97,10 @@ class Command(BaseCommand):
         if options['reload']:
             delete_models(removing_loaders)
             load_models(creation_loaders)
+            return
+
+        raise CommandError(
+            "Action is not set. Use one of [--load, --delete, --reload]")
 
     def process_inividual_model(self, options):
         model_loader = None
@@ -105,10 +109,9 @@ class Command(BaseCommand):
                 model_loader = self.loaders_dict[command]
                 break
         if not model_loader:
-            print(
+            raise CommandError(
                 ('Loader not found, you should use one'
                  f'of {self.loaders_dict.keys()} values'))
-            return
 
         if options['load']:
             model_loader.load()
@@ -126,7 +129,9 @@ class Command(BaseCommand):
             model_loader.reload()
             return
 
-        print("Action is not set")
+        raise CommandError(
+            "Command is not set. Use one of"
+            " [--load, --show, --delete, --reload]")
 
     def handle(self, *args, **options):
 
