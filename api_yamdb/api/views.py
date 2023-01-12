@@ -60,33 +60,43 @@ class AuthViewSet(GenericViewSet):
     serializer_class = AuthSignupSerializer
     permission_classes = [AllowAny]
 
+    def send_confirmation_code(self, user):
+        """Function to generate token and send it to user via registered email.
+        """
+        confirmation_code = default_token_generator.make_token(user)
+        email_text = (
+            f'To confirm user {user} registration '
+            f'please use {confirmation_code} code.'
+        )
+        user.email_user(
+            settings.REGISTRATION_EMAIL_SUBJECT,
+            email_text,
+            settings.REGISTRATION_EMAIL_FROM,
+            fail_silently=False,
+        )
+
     @action(["post"], detail=False)
     def signup(self, request):
         """ Function to process API requests with auth/signup/ URI.
         """
         try:
             user = User.objects.get(
-                username__iexact=request.data.get('username')
+                username__iexact=request.data.get('username'),
+                email__iexact=request.data.get('email')
             )
         except ObjectDoesNotExist:
             serializer = AuthSignupSerializer(data=request.data)
-        else:
-            serializer = AuthSignupSerializer(user, data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            confirmation_code = default_token_generator.make_token(user)
-            email_text = (
-                f'To confirm user {user} registration '
-                f'please use {confirmation_code} code.'
-            )
-            user.email_user(
-                settings.REGISTRATION_EMAIL_SUBJECT,
-                email_text,
-                settings.REGISTRATION_EMAIL_FROM,
-                fail_silently=False,
-            )
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
+                user = serializer.save()
+                self.send_confirmation_code(user)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        self.send_confirmation_code(user)
+        return Response(request.data, status=status.HTTP_200_OK)
 
     @action(["post"], detail=False)
     def token(self, request):

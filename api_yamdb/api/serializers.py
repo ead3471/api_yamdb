@@ -100,25 +100,22 @@ class UserSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 'Username \'me\' is reserved, please choose another one'
             )
+        if User.objects.filter(
+            username__iexact=value
+        ).exists():
+            raise ValidationError(
+                'A user with that username already exists.'
+            )
         return value
 
-    def validate(self, attrs):
+    def validate_email(self, value):
         if User.objects.filter(
-            username__iexact=attrs.get('username')
+            email__iexact=value
         ).exists():
             raise ValidationError(
-                'Such username is already registered, '
-                'please choose another one.'
+                'user with this Email address already exists.'
             )
-
-        if User.objects.filter(
-            email__iexact=attrs.get('email')
-        ).exists():
-            raise ValidationError(
-                'Such email is already registered, '
-                'please choose another one.'
-            )
-        return attrs
+        return value
 
 
 class UserRoleReadOnlySerializer(UserSerializer):
@@ -143,26 +140,6 @@ class AuthSignupSerializer(UserSerializer):
     class Meta:
         model = User
         fields = ('username', 'email')
-
-    def validate(self, attrs):
-        if User.objects.filter(
-            username__iexact=attrs.get('username')
-        ).exclude(
-            email__iexact=attrs.get('email')
-        ).exists():
-            raise ValidationError(
-                'Such user is already registered with different email'
-            )
-
-        if User.objects.filter(
-            email__iexact=attrs.get('email')
-        ).exclude(
-            username__iexact=attrs.get('username')
-        ).exists():
-            raise ValidationError(
-                'Such email is already registered for different user'
-            )
-        return attrs
 
 
 class AuthTokenSerializer(serializers.Serializer):
