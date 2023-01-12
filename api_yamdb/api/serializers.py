@@ -149,7 +149,7 @@ class AuthTokenSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         token = attrs.get('confirmation_code')
-        user = get_object_or_404(User, username=attrs.get('username'))
+        user = get_object_or_404(User, username__iexact=attrs.get('username'))
         if not default_token_generator.check_token(user, token):
             raise ValidationError('Invalid token')
         return attrs
