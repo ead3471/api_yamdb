@@ -105,7 +105,7 @@ class AuthViewSet(GenericViewSet):
         serializer = AuthTokenSerializer(data=request.data)
         if serializer.is_valid():
             user = get_object_or_404(
-                User, username=serializer.validated_data.get('username'))
+                User, username__iexact=serializer.validated_data.get('username'))
             tokens = RefreshToken.for_user(user)
             return Response(
                 data={'token': str(tokens.access_token)},
