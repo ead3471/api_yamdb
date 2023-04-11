@@ -14,52 +14,59 @@ Also **YAMDB** provides user management service including registration, profile 
 
 **YAMDB** platofrm is build with the use of the Django framework.
 
-In order to deploy this project you need to have installed python version 3.7 or later. Below are the steps required for initial deployment of the project. Please note that exact commands may differ depends on the host operating system.
+In order to deploy this project you need to have installed Docker application. Below are the steps required for initial deployment of the project. Please note that exact commands may differ depends on the host operating system.
 
 1. Clone git repository and navigate to the cloned repository in the CLI:
 
 ```
-git clone https://github.com/ead3471/api_yamdb.git
+git@github.com:ead3471/api_yamdb.git
 ```
 
 ```
-cd api_yamdb
+cd infra_sp2/api_yamdb
 ```
 
-2. Create and activate virtual environment *(Optional)*:
+2. Edit .env_sample file and save as .env
+
+3. Build images and run docker containers:
 
 ```
-python3 -m venv env
-```
-
-```
-source env/bin/activate
-```
-
-```
-python3 -m pip install --upgrade pip
-```
-
-3. Install modules required for project:
-
-```
-pip install -r requirements.txt
+docker-compose up -d --build
 ```
 
 4. Run migrations:
 
 ```
-python3 manage.py migrate
+docker-compose exec web python manage.py migrate
 ```
 
-5. Start Django server:
+5. Create Django superuser:
 
 ```
-python3 manage.py runserver
+docker-compose exec web python manage.py createsuperuser
 ```
 
-6. Donate to the project Team (*Optional*).
+6. Collect static
+
+```
+docker-compose exec web python manage.py collectstatic --no-input
+```
+
 
 ### API specification
 
-Complete API specification is available [here in YAML format](https://github.com/ead3471/api_yamdb/blob/master/api_yamdb/static/redoc.yaml) or at http://127.0.0.1:8000/redoc after project deployment.
+Complete API specification is available at http://127.0.0.1/redoc after project deployment.
+
+### Authors:
+ - Gubarik Vladimir
+ - Bogdanova Evgenia
+ - Kovchegin Andrew
+
+
+### Used technologies:
+![Alt-Текст](https://img.shields.io/badge/python-3.7-blue)
+![Alt-Текст](https://img.shields.io/badge/django-2.2.16-blue)
+![Alt-Текст](https://img.shields.io/badge/djangorestframework-3.12.4-blue)
+![Alt-Текст](https://img.shields.io/badge/docker-20.10.23-blue)
+![Alt-Текст](https://img.shields.io/badge/nginx-1.21.3-blue)
+![Alt-Текст](https://img.shields.io/badge/gunicorn-20.0.4-blue)
